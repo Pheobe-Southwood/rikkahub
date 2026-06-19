@@ -48,6 +48,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import me.rerere.rikkahub.R
 import me.rerere.rikkahub.data.model.Assistant
 import me.rerere.rikkahub.data.model.AssistantMemory
+import me.rerere.rikkahub.data.ai.tools.DEFAULT_MEMORY_TOOL_USER_PROMPT
 import me.rerere.rikkahub.ui.components.nav.BackButton
 import me.rerere.rikkahub.ui.components.ui.CardGroup
 import me.rerere.rikkahub.ui.components.ui.RikkaConfirmDialog
@@ -253,7 +254,13 @@ private fun AssistantMemoryContent(
 
         CardGroup(title = { Text(stringResource(R.string.assistant_page_memory_tool_prompt)) }) {
             item(
-                onClick = { showMemoryToolPromptEditor = true },
+                onClick = {
+                    // 旧数据兼容迁移：如果 memoryToolPrompt 为空，自动填充默认文本
+                    if (assistant.memoryToolPrompt.isBlank()) {
+                        onUpdateAssistant(assistant.copy(memoryToolPrompt = DEFAULT_MEMORY_TOOL_USER_PROMPT))
+                    }
+                    showMemoryToolPromptEditor = true
+                },
                 headlineContent = { Text(stringResource(R.string.assistant_page_memory_tool_prompt_desc)) },
                 trailingContent = {
                     Icon(
@@ -331,7 +338,7 @@ private fun AssistantMemoryContent(
             onUpdateAssistant(assistant.copy(memoryToolPrompt = newPrompt))
         },
         onResetPrompt = {
-            onUpdateAssistant(assistant.copy(memoryToolPrompt = ""))
+            onUpdateAssistant(assistant.copy(memoryToolPrompt = DEFAULT_MEMORY_TOOL_USER_PROMPT))
         },
         show = showMemoryToolPromptEditor,
         onDismiss = { showMemoryToolPromptEditor = false },
