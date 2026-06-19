@@ -18,6 +18,12 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Install web-ui build dependencies (zsh + pnpm)
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq zsh
+          npm install -g pnpm
+          cd web-ui && pnpm install && cd ..
+
       - name: Gradle cache
         uses: actions/cache@v4
         with:
@@ -28,7 +34,6 @@ jobs:
 
       - name: Prepare build files
         run: |
-          # 写入Google Services配置 (debug构建仍需此文件)
           echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > app/google-services.json
 
       - name: Gradle Debug Build
